@@ -28,7 +28,7 @@ client.on('error', err => console.error(err));
 app.listen(PORT, () => console.log(`listening on port ${PORT}`));
 
 //variable to store our city/location object
-let city; 
+let city;
 //=======================================================================================================//
 
 app.get('/location', getLocation);
@@ -99,8 +99,7 @@ function City(query, data){
   this.formatted_query = data.formatted_address;
   this.latitude = data.geometry.location.lat;
   this.longitude = data.geometry.location.lng;
-  this.id; 
-
+  this.id;
 }
 
 ///prototype function to City constructor function to post NEW data in database
@@ -114,7 +113,6 @@ City.prototype.postLocation = function (){
     .then (result => {
       this.id = result.rows[0].id;
     });
-
 };
 
 //=============================================================================================================//
@@ -157,11 +155,11 @@ function searchWeatherDarksky (req, res){
       let weatherSummaries = weatherDisplay.body.daily.data.map((day) => {
         return new Weather(day);  //create new Weather object and push it to weather Summaries
       });
-      
+
       weatherSummaries.forEach((day)=>{
         cacheWeather(day, city.id);
       });
-      
+
       res.send(weatherSummaries); //send WeatherSummaries array as a response
     });
 }
@@ -208,7 +206,7 @@ function getEvents(req, res){
       if (location){
         //if exists send the object as response
         res.send(location);
-        console.log ("events db data used");
+        console.log ('events db data used');
       }
 
       //if doesn't exists go to go to Eventbrite api
@@ -216,9 +214,9 @@ function getEvents(req, res){
       {//req.query.data gives us
         searchEventsEventbrite(req, res)
            .then(location =>{
-             console.log('EVEtbrite DATA used');
+             console.log('Eventbrite DATA used');
              res.send(location);
-             
+
 
         });
       }
@@ -241,19 +239,19 @@ let lookupEvents = (location) =>{
 
 function searchEventsEventbrite(req, res){
   const api_url = `https://www.eventbriteapi.com/v3/events/search?token=${process.env.EVENTBRITE_API_KEY}&location.address=${req.query.data.search_query}`;
-  
+
   return superagent.get(api_url)
 
     .then(result => {
-      
+
       let eventSummaries = result.body.events.map((event) => {
        return new Event(event);  //create new Event object and push it to Event Summaries
-       
+
       });
-      
+
       eventSummaries.forEach((event) => {
         cacheEvents(event, city.id);
-       
+
       });
 
       res.send(eventSummaries); //send Eventbrite summaries array as a response
